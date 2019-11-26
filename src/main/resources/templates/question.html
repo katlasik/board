@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments/head.html :: head(title='question.page')"></head>
+
+<body>
+<header class="masthead mb-auto"  th:insert="fragments/header.html :: nav"></header>
+<div class="container-fluid d-flex h-100 p-3 mx-auto flex-column justify-content-center">
+    <main role="main" class="inner cover">
+        <div th:insert="fragments/banner.html :: div"></div>
+        <div class="card-body d-flex flex-column align-items-start justify-content-start">
+            <h3 class="mb-0">
+                <strong class="text-white" th:text="${question.title}"></strong>
+            </h3>
+            <div class="mb-1 text-muted" th:text="${question.user.name}"></div>
+            <p class="card-text mb-auto" th:text="${question.content}"></p>
+        </div>
+        <div th:each="anwser : ${question.answers}" class="card-body d-flex flex-column align-items-start justify-content-start whitespace">
+            <div class="mb-1 text-muted" th:text="${anwser.user.name}"></div>
+            <p class="card-text mb-auto" th:text="${anwser.content}"></p>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="card-body d-flex flex-column align-items-start justify-content-start">
+            <form th:object="${answer}" method="post" action="/new-answer">
+                <div class="form-group">
+                    <textarea th:field="*{content}" th:placeholder="#{question.content}" class="form-control" id="question" rows="3"></textarea>
+                    <div class="alert alert-danger" th:each="error: ${#fields.errors('content')}"
+                         th:text="${error}"></div>
+                </div>
+                <input
+                        type="hidden"
+                        th:field="*{questionId}"
+                        />
+                <input
+                        type="hidden"
+                        th:name="${_csrf.parameterName}"
+                        th:value="${_csrf.token}"/>
+                <button class="btn btn-lg btn-primary btn-block" th:text="#{question.answer}" type="submit"></button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<footer th:replace="fragments/footer.html :: footer"></footer>
+</body>
+</html>

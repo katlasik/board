@@ -1,5 +1,6 @@
 package katlasik.board.configuration;
 
+import katlasik.board.model.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -11,27 +12,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-
-    private DataSource dataSource;
-
-    public SecurityConfiguration(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth)
             throws Exception {
         auth.
-                jdbcAuthentication()
-                .usersByUsernameQuery("select email, password, active from user where email=?")
-                .authoritiesByUsernameQuery("select email, role from user where email=?")
-                .dataSource(dataSource)
-                .passwordEncoder(passwordEncoder());
+                inMemoryAuthentication()
+                .withUser("user@mail.com")
+                .password(passwordEncoder().encode("pass"))
+                .roles(Role.USER.name());
     }
 
     @Override
@@ -45,13 +37,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/login*", "/registration*", "/thank-you*", "/question/*").permitAll()
+                .antMatchers("/").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
+                //.loginPage("/login")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/home", true)
                 .failureUrl("/login?error=true")
                 .and()
                 .logout()

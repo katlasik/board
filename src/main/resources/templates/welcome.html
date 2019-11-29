@@ -1,13 +1,11 @@
 <!DOCTYPE HTML>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head.html :: head(title='welcome.page')"></head>
+<head th:replace="fragments/head.html :: head(title='welcome.title')"></head>
 <body>
-<header class="masthead mb-auto"  th:insert="fragments/header.html :: nav"></header>
 <div class="container-fluid d-flex h-100 p-3 mx-auto flex-column">
     <main role="main" class="inner cover">
-        <div th:insert="fragments/banner.html :: div"></div>
-        <h4 th:text="#{welcome.latestQuestions}"></h4>
-        <div th:insert="fragments/questions.html :: div(questions=${questions})"></div>
+        <h3 th:text="#{welcome.invitation}"></h3>
+        <a th:href="@{/home}" th:text="#{navigation.login}"></a>
     </main>
 </div>
 <footer th:replace="fragments/footer.html :: footer"></footer>

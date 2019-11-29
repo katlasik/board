@@ -1,12 +1,14 @@
 <!DOCTYPE HTML>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head.html :: head(title='question.page')"></head>
+<head th:replace="fragments/head.html :: head(title='home.title')"></head>
 
 <body>
-<header class="masthead mb-auto"  th:insert="fragments/header.html :: nav"></header>
 <div class="container-fluid d-flex h-100 p-3 mx-auto flex-column justify-content-center">
     <main role="main" class="inner cover">
-        <div th:insert="fragments/questions.html :: div(questions=${questions})"></div>
+        <main role="main" class="inner cover">
+            <h3 th:text="#{home.invitation}"></h3>
+            <a th:href="@{/logout}" th:text="#{navigation.logout}"></a>
+        </main>
     </main>
 </div>
 

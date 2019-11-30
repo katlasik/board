@@ -12,7 +12,7 @@ jobs:
     steps:
       - checkout
       - run: |
-          apt-get update && apt-get install -qq  lsb-release default-mysql-client netcat
+          apt-get update && apt-get install -qq  lsb-release default-mysql-client netcat curl
       - run: |
           for i in `seq 1 10`;
           do
@@ -30,6 +30,5 @@ jobs:
             - ~/.m2
           key: java-workshop-{{ checksum "pom.xml" }}
       - run: mvn test
-      - codecov/upload:
-          file: target/site/jacoco/jacoco.xml
+      - run: bash <(curl -s https://codecov.io/bash)
 

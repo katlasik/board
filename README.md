@@ -1,4 +1,5 @@
 [![CircleCI](https://circleci.com/gh/katlasik/board.svg?style=svg)](https://circleci.com/gh/katlasik/board)
+[![codecov](https://codecov.io/gh/katlasik/board/branch/master/graph/badge.svg)](https://codecov.io/gh/katlasik/board)
 
 # Motivation
 This is example question board built with Spring Boot.

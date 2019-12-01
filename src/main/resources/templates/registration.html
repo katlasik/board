@@ -33,7 +33,7 @@
                  th:text="${error}"></div>
             </p>
             <p>
-                <label th:text="#{registration.repeatPassword}" for="password" class="sr-only"></label>
+                <label th:text="#{registration.repeatPassword}" for="password-repeat" class="sr-only"></label>
                 <input type="password" id="password-repeat" th:field="*{passwordRepeat}" class="form-control"
                        th:placeholder="#{registration.repeatPassword}"
                        required>

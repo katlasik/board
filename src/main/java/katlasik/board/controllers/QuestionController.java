@@ -6,11 +6,9 @@ import katlasik.board.services.QuestionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 
@@ -41,11 +39,13 @@ public class QuestionController {
         var maybeQuestion = questionService.findWithAnswers(questionId);
 
         return maybeQuestion.map(
-            question -> {
-                model.addAttribute("question", question);
-                model.addAttribute("answer", new NewAnswer(questionId));
-                return "question";
-            }
+                question -> {
+                    if (!model.containsAttribute("answer")) {
+                        model.addAttribute("answer", new NewAnswer(questionId));
+                    }
+                    model.addAttribute("question", question);
+                    return "question";
+                }
         ).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Couldn't find question with id=" + questionId + "."));
     }
 
@@ -60,10 +60,14 @@ public class QuestionController {
     }
 
     @PostMapping("/new-answer")
-    public String postAnswer(@ModelAttribute("answer") @Valid NewAnswer answer, BindingResult bindingResult) {
+    public String postAnswer(@ModelAttribute("answer") @Valid NewAnswer answer, BindingResult bindingResult, RedirectAttributes attr) {
         if (!bindingResult.hasErrors()) {
             questionService.createAnswer(answer);
+        } else {
+            attr.addFlashAttribute(BindingResult.MODEL_KEY_PREFIX + "answer", bindingResult);
+            attr.addFlashAttribute("answer", answer);
         }
+
         return "redirect:/question/" + answer.getQuestionId();
     }
 

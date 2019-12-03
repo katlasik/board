@@ -96,3 +96,17 @@ form {
 .whitespace {
     white-space: pre;
 }
+
+.hidden {
+    display: none;
+}
+
+form p {
+    position: relative;
+}
+
+form label + span {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}

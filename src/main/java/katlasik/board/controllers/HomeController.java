@@ -26,9 +26,10 @@ public class HomeController {
 
     @GetMapping("/my-questions")
     public String getMyQuestions(Model model) {
-        var userId = securityService.getLoggedInUser().getId();
-        model.addAttribute("questions", questionService.findQuestionViewsByUserId(userId));
-        return "welcome";
+        var user = securityService.getLoggedInUser();
+        model.addAttribute("questions", questionService.findQuestionViewsByUserId(user.getId()));
+        model.addAttribute("user", user);
+        return "my-questions";
     }
 
     @GetMapping("/login")

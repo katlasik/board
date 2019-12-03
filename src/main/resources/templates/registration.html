@@ -9,29 +9,34 @@
             <h2 class="form-signin-heading" th:placeholder="#{registration.registration}"></h2>
             <p>
                 <label th:text="#{registration.name}" for="name" class="sr-only"></label>
+                <span class="hidden text-danger" th:text="#{registration.nameExists}"></span>
                 <input type="text" id="name" th:field="*{name}" class="form-control"
                        th:placeholder="#{registration.name}"
                        required
                        autofocus>
+            </p>
             <div class="alert alert-danger" th:each="error: ${#fields.errors('name')}"
                  th:text="${error}"></div>
-            </p>
+
             <p>
                 <label th:text="#{registration.email}" for="email" class="sr-only"></label>
+                <span class="hidden text-danger" th:text="#{registration.emailExists}"></span>
                 <input type="text" id="email" th:field="*{email}" class="form-control"
                        th:placeholder="#{registration.email}" required
                        autofocus>
+            </p>
             <div class="alert alert-danger" th:each="error: ${#fields.errors('email')}"
                  th:text="${error}"></div>
-            </p>
+
             <p>
                 <label th:text="#{registration.password}" for="password" class="sr-only"></label>
                 <input type="password" th:placeholder="#{registration.password}" id="password" th:field="*{password}"
                        class="form-control"
                        required>
+            </p>
             <div class="alert alert-danger" th:each="error: ${#fields.errors('password')}"
                  th:text="${error}"></div>
-            </p>
+
             <p>
                 <label th:text="#{registration.repeatPassword}" for="password-repeat" class="sr-only"></label>
                 <input type="password" id="password-repeat" th:field="*{passwordRepeat}" class="form-control"
@@ -40,13 +45,14 @@
             </p>
             <input
                     type="hidden"
+                    id="csrf-token"
                     th:name="${_csrf.parameterName}"
                     th:value="${_csrf.token}"/>
             <button class="btn btn-lg btn-primary btn-block" th:text="#{registration.register}" type="submit"></button>
         </form>
     </div>
 </main>
-
 <footer th:replace="fragments/footer.html :: footer"></footer>
+<script th:src="@{/js/registration.js}"></script>
 </body>
 </html>

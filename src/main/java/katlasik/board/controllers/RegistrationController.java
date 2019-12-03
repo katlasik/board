@@ -1,13 +1,13 @@
 package katlasik.board.controllers;
 
+import katlasik.board.dtos.RegistrationCheck;
+import katlasik.board.exceptions.IllegalFieldException;
 import katlasik.board.services.UserService;
 import katlasik.board.dtos.UserRegistration;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -18,6 +18,15 @@ public class RegistrationController {
 
     public RegistrationController(UserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping(path = "/registration/check", produces = "application/json")
+    public @ResponseBody RegistrationCheck checkField(@RequestParam("field") String field, @RequestParam("value") String value) {
+        switch (field) {
+            case "email": return new RegistrationCheck(field, userService.checkIfMailIsTaken(value));
+            case "name": return new RegistrationCheck(field, userService.checkIfNameIsTaken(value));
+            default: throw new IllegalFieldException();
+        }
     }
 
     @PostMapping("/registration")

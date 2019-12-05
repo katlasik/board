@@ -6,7 +6,9 @@ import katlasik.board.model.Role;
 import katlasik.board.model.User;
 import katlasik.board.repositories.AnswerRepository;
 import katlasik.board.repositories.QuestionRepository;
+import katlasik.board.services.ContentService;
 import katlasik.board.services.SecurityService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.Any;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +16,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -24,8 +28,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,12 +49,29 @@ class QuestionControllerTest {
     @MockBean
     AnswerRepository answerRepository;
 
+    @MockBean
+    ContentService contentService;
+
     @Test
+    @DisplayName("User should be able to post question")
     @WithMockUser(username = "user@gmail.com")
     void postQuestion() throws Exception {
 
         var title = "title title";
-        var content = "content content content conent";
+        var content = "content content content content";
+
+        var bytes = new byte[]{1};
+        var file = mock(MultipartFile.class);
+        when(file.getBytes()).thenReturn(bytes);
+        when(file.getOriginalFilename()).thenReturn("obrazek.jpg");
+        when(file.getSize()).thenReturn(1L);
+
+        var multipartFile = new MockMultipartFile(
+                "files",
+                "obrazek.jpg",
+                "image/jpg",
+                bytes
+        );
 
         var user = mock(User.class);
         when(user.getEmail()).thenReturn("user@gmail.com");
@@ -66,8 +86,10 @@ class QuestionControllerTest {
 
         when(securityService.getLoggedInUser()).thenReturn(user);
         when(questionRepository.save(question)).thenReturn(persisted);
+        when(contentService.isImage(bytes)).thenReturn(true);
 
-        mockMvc.perform(post("/new-question")
+        mockMvc.perform(multipart("/new-question")
+                .file(multipartFile)
                 .param("title", title)
                 .param("content", content)
                 .with(csrf())
@@ -76,10 +98,59 @@ class QuestionControllerTest {
 
         verify(securityService, times(1)).getLoggedInUser();
         verify(questionRepository, times(1)).save(question);
-
+        verify(contentService, times(1)).isImage(bytes);
     }
 
     @Test
+    @DisplayName("User should NOT be able to post question with wrong attachment")
+    @WithMockUser(username = "user@gmail.com")
+    void postQuestionWithWrongImages() throws Exception {
+
+        var title = "title title";
+        var content = "content content content content";
+
+        var bytes = new byte[]{1};
+        var file = mock(MultipartFile.class);
+        when(file.getBytes()).thenReturn(bytes);
+        when(file.getOriginalFilename()).thenReturn("obrazek.jpg");
+        when(file.getSize()).thenReturn(1L);
+
+        var multipartFile = new MockMultipartFile(
+                "files",
+                "obrazek.jpg",
+                "application/pdf",
+                bytes
+        );
+
+        var user = mock(User.class);
+        when(user.getEmail()).thenReturn("user@gmail.com");
+
+        var question = new Question();
+        question.setUser(user);
+        question.setContent(content);
+        question.setTitle(title);
+
+        var persisted = mock(Question.class);
+        when(persisted.getId()).thenReturn(1L);
+
+        when(securityService.getLoggedInUser()).thenReturn(user);
+        when(contentService.isImage(bytes)).thenReturn(false);
+
+        mockMvc.perform(multipart("/new-question")
+                .file(multipartFile)
+                .param("title", title)
+                .param("content", content)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isForbidden());
+
+        verify(contentService, times(1)).isImage(bytes);
+        verify(securityService, times(1)).getLoggedInUser();
+        verify(questionRepository, never()).save(question);
+    }
+
+    @Test
+    @DisplayName("User should able to get content of question")
     @WithMockUser
     void getNewQuestion() throws Exception {
         mockMvc.perform(get("/new-question")).andDo(print()).andExpect(status().isOk())
@@ -122,6 +193,7 @@ class QuestionControllerTest {
     }
 
     @Test
+    @DisplayName("User should able to post new answer while authenticated.")
     @WithMockUser
     void getQuestionAuthenticated() throws Exception {
 
@@ -139,6 +211,7 @@ class QuestionControllerTest {
     }
 
     @Test
+    @DisplayName("Anonymous user should be able to see question")
     void getQuestionAnonymous() throws Exception {
 
         setupQuestion();
@@ -156,6 +229,7 @@ class QuestionControllerTest {
 
     @Test
     @WithMockUser(username = "user@gmail.com")
+    @DisplayName("Authenticated user should be able to post answer")
     void postAnswer() throws Exception {
         var content = "content content content content";
 

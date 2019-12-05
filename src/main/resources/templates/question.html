@@ -13,6 +13,11 @@
             </h3>
             <div class="mb-1 text-muted" th:text="${question.user.name}"></div>
             <p class="card-text mb-auto" th:text="${question.content}"></p>
+            <div class="img-box">
+                <a th:data-lightbox="${image.name}" th:each="image: ${question.images}" th:href="${image.asByte64()}">
+                    <img th:src="${image.asByte64()}" th:alt="${image.name}" class="img-thumbnail">
+                </a>
+            </div>
         </div>
         <div th:each="anwser : ${question.answers}" class="card-body d-flex flex-column align-items-start justify-content-start whitespace">
             <div class="mb-1 text-muted" th:text="${anwser.user.name}"></div>

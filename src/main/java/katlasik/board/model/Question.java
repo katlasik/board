@@ -7,10 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 public class Question {
@@ -40,6 +37,10 @@ public class Question {
     @CreationTimestamp
     private LocalDateTime createdOn;
 
+    @ElementCollection
+    @CollectionTable(name = "question_images")
+    private Set<Image> images = new HashSet<>();
+
     public List<Answer> getAnswers() {
         return answers;
     }
@@ -47,6 +48,14 @@ public class Question {
     public void addAnswers(Answer answer){
         this.answers.add(answer);
         answer.setQuestion(this);
+    }
+
+    public Set<Image> getImages() {
+        return images;
+    }
+
+    public void addImage(Image image){
+        images.add(image);
     }
 
     public long getId() {

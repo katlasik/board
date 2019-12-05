@@ -1,6 +1,8 @@
 package katlasik.board.dtos;
 
 
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -18,6 +20,15 @@ public class NewQuestion {
     @Size(min = 20, max = 5000)
     private String content;
 
+    private MultipartFile[] files;
+
+    public MultipartFile[] getFiles() {
+        return files;
+    }
+
+    public void setFiles(MultipartFile[] files) {
+        this.files = files;
+    }
 
     public String getTitle() {
         return title;

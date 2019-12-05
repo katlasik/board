@@ -2,6 +2,12 @@ function registerCheck(fieldSelector) {
     const $field = $(fieldSelector)
     const $csrf = $("#csrf-token")
 
+    $field.on("keydown", () => {
+        $($field).prev("span").addClass("hidden")
+        $($field).removeClass("error")
+    })
+
+
     $field.on("keydown", debounce(() => {
 
         const value = $field.val()
@@ -17,9 +23,8 @@ function registerCheck(fieldSelector) {
             },
             success: ({taken}) => {
                 if (taken) {
+                    $($field).addClass("error");
                     $($field).prev("span").removeClass("hidden");
-                } else {
-                    $($field).prev("span").addClass("hidden");
                 }
             }
         })

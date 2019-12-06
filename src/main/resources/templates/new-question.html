@@ -22,7 +22,8 @@
             <div class="form-group">
                 <label for="image" th:text="#{question.image}"></label>
                 <div class="file btn btn-primary">
-                    <span th:text="#{question.upload}"></span>
+                    <label th:text="#{question.upload}"></label>
+                    <template th:text="#{question.uploaded}"></template>
                     <input accept="image/*" th:field="*{files}" class="btn-primary form-control-file" id="image" multiple type="file"/>
                 </div>
             </div>

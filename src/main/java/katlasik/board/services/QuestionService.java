@@ -8,6 +8,8 @@ import katlasik.board.model.Image;
 import katlasik.board.model.Question;
 import katlasik.board.repositories.AnswerRepository;
 import katlasik.board.repositories.QuestionRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,12 +45,12 @@ public class QuestionService {
         return questionRepository.findWithAnswers(questionId);
     }
 
-    public List<QuestionView> findQuestionViews() {
-        return questionRepository.findQuestionViews();
+    public Page<QuestionView> findQuestionViews(Pageable page) {
+        return questionRepository.findQuestionViews(page);
     }
 
-    public List<QuestionView> findQuestionViewsByUserId(Long userId) {
-        return questionRepository.findQuestionViewsById(userId);
+    public Page<QuestionView> findQuestionViewsByUserId(Long userId, Pageable page) {
+        return questionRepository.findQuestionViewsById(userId, page);
     }
 
     private List<Image> processImages(MultipartFile[] files) {

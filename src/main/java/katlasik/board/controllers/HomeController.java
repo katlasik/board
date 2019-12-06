@@ -2,6 +2,7 @@ package katlasik.board.controllers;
 
 import katlasik.board.services.SecurityService;
 import katlasik.board.services.QuestionService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,15 +20,15 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String getWelcome(Model model) {
-        model.addAttribute("questions", questionService.findQuestionViews());
+    public String getWelcome(Model model, Pageable page) {
+        model.addAttribute("questions", questionService.findQuestionViews(page));
         return "welcome";
     }
 
     @GetMapping("/my-questions")
-    public String getMyQuestions(Model model) {
+    public String getMyQuestions(Model model, Pageable page) {
         var user = securityService.getLoggedInUser();
-        model.addAttribute("questions", questionService.findQuestionViewsByUserId(user.getId()));
+        model.addAttribute("questions", questionService.findQuestionViewsByUserId(user.getId(), page));
         model.addAttribute("user", user);
         return "my-questions";
     }

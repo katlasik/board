@@ -2,12 +2,13 @@ package katlasik.board.repositories;
 
 import katlasik.board.dtos.QuestionView;
 import katlasik.board.model.Question;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,8 +18,8 @@ public interface QuestionRepository extends PagingAndSortingRepository<Question,
     Optional<Question> findWithAnswers(Long id);
 
     @Query("select new katlasik.board.dtos.QuestionView(q.id, q.title, size(a)) from Question q left join q.answers a group by q.id, q.title order by q.createdOn desc ")
-    List<QuestionView> findQuestionViews();
+    Page<QuestionView> findQuestionViews(Pageable page);
 
     @Query("select new katlasik.board.dtos.QuestionView(q.id, q.title, size(a)) from Question q left join q.answers a where q.user.id = ?1 group by q.id, q.title order by q.createdOn desc ")
-    List<QuestionView> findQuestionViewsById(long usedId);
+    Page<QuestionView> findQuestionViewsById(long usedId, Pageable page);
 }

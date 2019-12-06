@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,7 +22,6 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -47,10 +48,14 @@ class HomeControllerTest {
     @DisplayName("Anonymous user should see questions and be able to use buttons for login and registration")
     void getWelcomeAnonymous() throws Exception {
 
-        when(questionRepository.findQuestionViews()).thenReturn(
-                List.of(
-                        new QuestionView(1L, "pyt1", 1),
-                        new QuestionView(2L, "pyt2", 2)
+        var page = PageRequest.of(0, 10);
+
+        when(questionRepository.findQuestionViews(page)).thenReturn(
+                new PageImpl<>(
+                        List.of(
+                                new QuestionView(1L, "pyt1", 1),
+                                new QuestionView(2L, "pyt2", 2)
+                        )
                 )
         );
 
@@ -61,7 +66,7 @@ class HomeControllerTest {
                 .andExpect(content().string(containsString("pyt2")))
                 .andExpect(content().string(not(containsString("Wyloguj się"))));
 
-        verify(questionRepository, times(1)).findQuestionViews();
+        verify(questionRepository, times(1)).findQuestionViews(page);
 
     }
 
@@ -70,10 +75,14 @@ class HomeControllerTest {
     @DisplayName("Authenticated user should see questions and see navigation bar")
     void getWelcomeAuthenticated() throws Exception {
 
-        when(questionRepository.findQuestionViews()).thenReturn(
-                List.of(
-                        new QuestionView(1L, "pyt1", 1),
-                        new QuestionView(2L, "pyt2", 2)
+        var page = PageRequest.of(0, 10);
+
+        when(questionRepository.findQuestionViews(page)).thenReturn(
+                new PageImpl<>(
+                        List.of(
+                                new QuestionView(1L, "pyt1", 1),
+                                new QuestionView(2L, "pyt2", 2)
+                        )
                 )
         );
 
@@ -84,7 +93,7 @@ class HomeControllerTest {
                 .andExpect(content().string(containsString("pyt2")))
                 .andExpect(content().string(containsString("Wyloguj się")));
 
-        verify(questionRepository, times(1)).findQuestionViews();
+        verify(questionRepository, times(1)).findQuestionViews(page);
 
     }
 
@@ -96,10 +105,14 @@ class HomeControllerTest {
         var user = mock(User.class);
         when(user.getId()).thenReturn(1L);
 
-        when(questionRepository.findQuestionViewsById(1L)).thenReturn(
-                List.of(
-                        new QuestionView(1L, "pyt1", 1),
-                        new QuestionView(2L, "pyt2", 2)
+        var page = PageRequest.of(0, 10);
+
+        when(questionRepository.findQuestionViewsById(1L, page)).thenReturn(
+                new PageImpl<>(
+                        List.of(
+                                new QuestionView(1L, "pyt1", 1),
+                                new QuestionView(2L, "pyt2", 2)
+                        )
                 )
         );
 
@@ -112,7 +125,7 @@ class HomeControllerTest {
                 .andExpect(content().string(containsString("pyt2")))
                 .andExpect(content().string(containsString("Wyloguj się")));
 
-        verify(questionRepository, times(1)).findQuestionViewsById(1L);
+        verify(questionRepository, times(1)).findQuestionViewsById(1L, page);
         verify(usersRepository, times(1)).findByEmail("myemail@gmail.com");
 
     }

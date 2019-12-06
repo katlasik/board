@@ -6,7 +6,7 @@
 <header class="masthead mb-auto"  th:insert="fragments/header.html :: nav"></header>
 <div class="container-fluid d-flex h-100 p-3 mx-auto flex-column justify-content-center">
     <main role="main" class="inner cover">
-        <h2 th:text="#{questions.myquestions(${questions.size()}, ${user})}"></h2>
+        <h2 th:text="#{questions.myquestions(${questions.getTotalElements()}, ${user.name})}"></h2>
         <div th:insert="fragments/questions.html :: div(questions=${questions})"></div>
     </main>
 </div>

@@ -1,5 +1,12 @@
 <div xmlns:th="http://www.thymeleaf.org">
-    <div th:each="question : ${questions}" class="card-body d-flex flex-column align-items-start justify-content-start">
+    <div th:each="question : ${questions.getContent()}" class="card-body d-flex flex-column align-items-start justify-content-start">
         <div class="mb-1"><a th:text="${question.title}" th:href="${'/question/' + question.id}"></a> <span th:text="#{question.count(${question.answerCount})}" class="badge badge-pill badge-success"></span></div>
     </div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li th:each="i: ${#numbers.sequence(0, questions.getTotalPages() - 1)}" th:classappend="${i == questions.getNumber()} ? 'active page-item' : 'page-item'">
+                <a class="page-link" th:href="@{${#httpServletRequest.requestURI + '?page=' + i}}" th:text="${i}"></a>
+            </li>
+        </ul>
+    </nav>
 </div>

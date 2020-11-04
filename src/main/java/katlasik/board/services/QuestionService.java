@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class QuestionService {
@@ -55,18 +56,21 @@ public class QuestionService {
 
     private List<Image> processImages(MultipartFile[] files) {
         return Arrays.stream(files)
-                .map(file -> {
+                .flatMap(file -> {
                     try {
                         var bytes = file.getBytes();
+
                         if (contentService.isImage(bytes)) {
-                            return new Image(
+                            return Stream.of(new Image(
                                     file.getOriginalFilename(),
                                     bytes,
                                     file.getContentType(),
                                     file.getSize()
-                            );
-                        } else {
+                            ));
+                        } else if (bytes.length > 0) {
                             throw new AccessDeniedException("Illegal mime type for image.");
+                        } else {
+                            return Stream.empty();
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);

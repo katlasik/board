@@ -16,6 +16,8 @@ function debounce(callback) {
 
 $(document).ready(() => {
 
+
+
     $('.file input').change(function(){
         const files = $(this)[0].files;
         const text = $(this).prev().html().replace("{0}", files.length)

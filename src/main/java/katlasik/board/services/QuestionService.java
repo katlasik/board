@@ -2,6 +2,7 @@ package katlasik.board.services;
 
 import katlasik.board.dtos.NewAnswer;
 import katlasik.board.dtos.NewQuestion;
+import katlasik.board.dtos.QuestionAdded;
 import katlasik.board.dtos.QuestionView;
 import katlasik.board.model.Answer;
 import katlasik.board.model.Image;
@@ -10,6 +11,7 @@ import katlasik.board.repositories.AnswerRepository;
 import katlasik.board.repositories.QuestionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,18 +30,20 @@ public class QuestionService {
     private final AnswerRepository answerRepository;
     private final SecurityService securityService;
     private final ContentService contentService;
+    private final SimpMessagingTemplate websockets;
 
 
     public QuestionService(
             QuestionRepository questionRepository,
             AnswerRepository answerRepository,
             SecurityService securityService,
-            ContentService contentService
-    ) {
+            ContentService contentService,
+            SimpMessagingTemplate websockets) {
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
         this.securityService = securityService;
         this.contentService = contentService;
+        this.websockets = websockets;
     }
 
     public Optional<Question> findWithAnswers(Long questionId) {
@@ -90,10 +94,23 @@ public class QuestionService {
 
     public Answer createAnswer(NewAnswer newAnswer) {
         var answer = new Answer();
-        answer.setQuestion(questionRepository.getOne(newAnswer.getQuestionId()));
-        answer.setUser(securityService.getLoggedInUser());
+        var question = questionRepository.getOne(newAnswer.getQuestionId());
+        var user = securityService.getLoggedInUser();
+
+        answer.setQuestion(question);
+        answer.setUser(user);
         answer.setContent(newAnswer.getContent());
-        return answerRepository.save(answer);
+        var saved = answerRepository.save(answer);
+
+        websockets.convertAndSend(
+                "/updates",
+                new QuestionAdded(
+                        question.getId(),
+                        question.getUser().getEmail(),
+                        user.getEmail())
+        );
+
+        return saved;
     }
 }
 

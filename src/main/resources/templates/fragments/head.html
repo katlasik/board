@@ -1,8 +1,11 @@
-<head xmlns:th="http://www.thymeleaf.org">
+<head xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/4.3.1/css/bootstrap.min.css}"/>
     <link rel="stylesheet" th:href="@{/webjars/lightbox/2.10.0/dist/css/lightbox.css}"/>
+    <link rel="stylesheet" th:href="@{/webjars/pnotify/3.2.1/pnotify.css}">
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
     <title th:text="${#messages.msgOrNull(title)}"></title>
+    <script type="data" id="user-name" sec:authentication="name"></script>
+    <script type="data" id="new-question-msg" th:text="#{question.newAnswer}"></script>
 </head>

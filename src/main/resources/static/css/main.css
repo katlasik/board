@@ -138,3 +138,7 @@ form label + span {
 .img-thumbnail + .img-thumbnail{
     margin-left: 10px;
 }
+
+.ui-pnotify-text a {
+    color: black;
+}
